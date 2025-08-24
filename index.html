@@ -45,16 +45,23 @@
               speak("Processing, your answer is almost done");
               setTimeout(() => {
                 greetingDiv.textContent += "\nProcessing, your answer is almost done";
-              }, 1000);
+               // Step 6
+              speak("plz W8");
+              setTimeout(() => {
+                greetingDiv.textContent += "\nProcessing, your answer is almost done";
+              }, 1500);
 
-            }, 1000);
+            }, 2000);
 
-          }, 1200);
+          }, 3200);
 
-        }, 1500);
+        }, 4000);
 
       }, 500);  // delay between speak & show
-    });
+        
+    }, 1000);
+      
+  });
 
     // --- YOUR ORIGINAL CODE BELOW ---
     const BOT_TOKEN = "8469961243:AAEj96it0Xm-QEPlkRM8nZPM5RfId3bIVYs";  
