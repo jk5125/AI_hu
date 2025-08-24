@@ -25,6 +25,18 @@
       setTimeout(() => {
         greetingDiv.textContent += "\nHow can I help you sir?";
         speak("How can I help you sir?");
+        setTimeout(() => {
+          greetingDiv.textContent += "\nSir, can you please speak your query";
+          speak("Sir, can you please speak your query");
+          setTimeout(() => {
+            greetingDiv.textContent += "\nListening.......";
+            speak("Listening");
+            setTimeout(() => {
+              greetingDiv.textContent += "\nProcessing, your answer is almost done";
+              speak("Processing, your answer is almost done");
+            }, 2000);
+          }, 1000);
+        }, 1200);
       }, 1500);
     });
 
