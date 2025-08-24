@@ -20,24 +20,40 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       const greetingDiv = document.getElementById("greeting");
-      greetingDiv.textContent = "Hi sir";
+
+      // Step 1
       speak("Hi sir");
       setTimeout(() => {
-        greetingDiv.textContent += "\nHow can I help you sir?";
+        greetingDiv.textContent = "Hi sir";
+
+        // Step 2
         speak("How can I help you sir?");
         setTimeout(() => {
-          greetingDiv.textContent += "\nSir, can you please speak your query";
+          greetingDiv.textContent += "\nHow can I help you sir?";
+
+          // Step 3
           speak("Sir, can you please speak your query");
           setTimeout(() => {
-            greetingDiv.textContent += "\nListening.......";
+            greetingDiv.textContent += "\nSir, can you please speak your query";
+
+            // Step 4
             speak("Listening");
             setTimeout(() => {
-              greetingDiv.textContent += "\nProcessing, your answer is almost done";
+              greetingDiv.textContent += "\nListening.......";
+
+              // Step 5
               speak("Processing, your answer is almost done");
-            }, 2000);
-          }, 1000);
-        }, 1200);
-      }, 1500);
+              setTimeout(() => {
+                greetingDiv.textContent += "\nProcessing, your answer is almost done";
+              }, 1000);
+
+            }, 1000);
+
+          }, 1200);
+
+        }, 1500);
+
+      }, 500);  // delay between speak & show
     });
 
     // --- YOUR ORIGINAL CODE BELOW ---
